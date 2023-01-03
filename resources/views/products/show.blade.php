@@ -29,9 +29,9 @@
                                 <div class="form-group">
                                     <label for="category">Category</label>
                                     <select class="form-control" name="category_id" id="category">
-                                        @foreach(\App\Models\Product::CATEGORIES as $id => $category)
-                                            <option value="{{ $id }}"
-                                                    @if($product->category_id == $id) selected @endif>{{ $category }}</option>
+                                        @foreach(\App\Models\Category::pluck('name', 'id') as $key => $category)
+                                            <option value="{{ $key }}"
+                                                    @if($product->category_id == $key) selected @endif>{{ $category }}</option>
                                         @endforeach
                                     </select>
                                 </div>

@@ -69,7 +69,10 @@ class ProductController extends Controller
      */
     public function update(Request $request, Product $product)
     {
-        $product->update(\request()->all());
+        $input = \request()->all();
+        $input['user_id'] = 2;
+        // dd($data);
+        $product->update($input);
         // flash('Product updated')->success();
         return redirect("product/$product->id");
     }

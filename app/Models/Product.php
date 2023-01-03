@@ -7,11 +7,15 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use OwenIt\Auditing\Contracts\Auditable;
 use OwenIt\Auditing\Redactors\LeftRedactor;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\Contracts\Activity;
 
 class Product extends Model implements Auditable
 {
     use HasFactory;
     use \OwenIt\Auditing\Auditable;
+    use LogsActivity;
 
     public const CATEGORIES = [
         'Phones and Electronics',
@@ -21,7 +25,7 @@ class Product extends Model implements Auditable
     ];
 
 
-    protected $guarded = [];
+    protected $fillable = ['name', 'category_id', 'quantity', 'description', 'user_id'];
 
     protected $auditInclude = [
         'name',
@@ -40,10 +44,50 @@ class Product extends Model implements Auditable
     public function transformAudit(array $data): array
     {
         if (Arr::has($data, 'new_values.category_id')) {
-            $data['old_values']['category_id'] = self::CATEGORIES[$this->getOriginal('category_id')];
-            $data['new_values']['category_id'] = self::CATEGORIES[$this->getAttribute('category_id')];
+            $data['old_values']['category_id'] = Category::find($this->getOriginal('category_id'))->name;
+            $data['new_values']['category_id'] = Category::find($this->getAttribute('category_id'))->name;
+
+            // $data['old_values']['category_id'] = self::CATEGORIES[$this->getOriginal('category_id')];
+            // $data['new_values']['category_id'] = self::CATEGORIES[$this->getAttribute('category_id')];
         }
 
         return $data;
+    }
+
+    /*** LogsActivity **/
+
+
+    //  protected static $recordEvents = ['deleted']; //only the `deleted` event will get logged automatically
+
+
+    // public function tapActivity(Activity $activity, string $eventName)
+    // {
+    //     $activity->description = "activity.logs.message.{$eventName}";
+    // }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            // ->setDescriptionForEvent(fn(string $eventName) => "This model has been {$eventName}")
+            ->useLogName('system')
+            ->logOnly(['name', 'quantity', 'description', 'user.name', 'category.name'])
+            // ->dontLogIfAttributesChangedOnly(['name'])
+            // ->logFillable() // log changes to all the $fillable
+            // >logUnguarded() // to add all attributes that are not listed in $guarded.
+            // ->logAll()
+            // ->dontLogIfAttributesChangedOnly(['description'])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ;
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
     }
 }
