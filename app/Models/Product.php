@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Arr;
 use OwenIt\Auditing\Contracts\Auditable;
 use OwenIt\Auditing\Redactors\LeftRedactor;
@@ -54,6 +55,11 @@ class Product extends Model implements Auditable
         return $data;
     }
 
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'products_users')->withPivot('name');
+    }
+
     /*** LogsActivity **/
 
 
@@ -81,6 +87,7 @@ class Product extends Model implements Auditable
             ;
     }
 
+
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -89,5 +96,9 @@ class Product extends Model implements Auditable
     public function category()
     {
         return $this->belongsTo(Category::class);
+    }
+
+    public function activityLogs() {
+        return \Spatie\Activitylog\Models\Activity::where('subject_type', $this::class)->where('subject_id', $this->id)->get();
     }
 }

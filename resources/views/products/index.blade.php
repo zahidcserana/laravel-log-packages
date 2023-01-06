@@ -14,6 +14,10 @@
                             <a href="{{ route('product.edit', ['product' => $product]) }}" class="list-group-item">
                                 {{ $product->name }}
                             </a>
+                            |
+                            <a href="{{ route('product.activitylog', ['product' => $product]) }}" class="">
+                                activitylog
+                            </a>
                             <br>
                         @endforeach
                     </div>

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Spatie\Activitylog\Models\Activity;
 
 class ProductController extends Controller
 {
@@ -15,6 +16,13 @@ class ProductController extends Controller
     public function index()
     {
         return view('products.index', ['products' => Product::all()]);
+    }
+
+    public function activitylog(Product $product)
+    {
+        $activitylogs = $product->activityLogs();
+
+        return view('activitylog.index', ['activitylog' => $activitylogs]);
     }
 
     /**
@@ -70,8 +78,6 @@ class ProductController extends Controller
     public function update(Request $request, Product $product)
     {
         $input = \request()->all();
-        $input['user_id'] = 2;
-        // dd($data);
         $product->update($input);
         // flash('Product updated')->success();
         return redirect("product/$product->id");
