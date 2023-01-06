@@ -17,6 +17,7 @@ class Product extends Model implements Auditable
     use HasFactory;
     use \OwenIt\Auditing\Auditable;
     use LogsActivity;
+    use \ElaborateCode\EloquentLogs\Concerns\HasLogs;
 
     public const CATEGORIES = [
         'Phones and Electronics',

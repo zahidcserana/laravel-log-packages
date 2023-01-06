@@ -54,6 +54,10 @@ class ProductController extends Controller
      */
     public function show(Product $product)
     {
+        // $data = $product->eloquentLogs;
+        // $data = $product->load('eloquentLogs');
+
+        // dd($data);
         return view('products.show', ['product' => $product]);
     }
 
